@@ -1,4 +1,4 @@
-package server
+package pkg
 
 import (
 	"encoding/base64"
@@ -17,7 +17,7 @@ var (
 	clientConfig config.ClientConfig
 )
 
-func InitServer(config config.ClientConfig) {
+func InitClient(config config.ClientConfig) {
 	clientConfig = config;
 	oidcConfig = utils.GenOIDCConfig(config.ClientId, config.ClientSecret, config.WellKnownUrl);
 	e := echo.New()
@@ -51,6 +51,7 @@ func logout(context echo.Context) error {
 	cookie.Name = "data";
 	cookie.Value = "";
 	cookie.Path = "/"
+	cookie.MaxAge = -1;
 	context.SetCookie(&cookie);
 	return context.String(http.StatusOK, "you are logged out now.");
 }
@@ -62,7 +63,7 @@ func dashboard(context echo.Context) error {
 		return context.JSON(http.StatusForbidden, "no permission,not login in !");
 	}
 	result, _ := base64.StdEncoding.DecodeString(data.Value);
-	json.Unmarshal(result, &userInfo);
+	_ = json.Unmarshal(result, &userInfo);
 	return context.JSON(http.StatusOK, userInfo);
 }
 
@@ -86,7 +87,7 @@ func callback(context echo.Context) error {
 	cookie := http.Cookie{};
 	cookie.Name = "data";
 	cookie.Value = data;
-	cookie.Path = "/"
+	cookie.Path = "/";
 	context.SetCookie(&cookie);
 	return context.Redirect(http.StatusFound, "/dashboard");
 }

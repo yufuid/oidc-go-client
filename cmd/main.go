@@ -7,7 +7,7 @@ import (
 	"os"
 	"strings"
 	"yufuid.com/oidc-go-client/config"
-	"yufuid.com/oidc-go-client/server"
+	"yufuid.com/oidc-go-client/pkg"
 )
 
 var (
@@ -26,7 +26,7 @@ var (
 var serverCommand = &cobra.Command{
 	Use: "server",
 	Run: func(cmd *cobra.Command, args []string) {
-		server.InitServer(cfg);
+		pkg.InitClient(cfg);
 	},
 	PreRun: func(cmd *cobra.Command, args []string) {
 		initConfig();
