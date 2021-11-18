@@ -1,5 +1,9 @@
 package config
 
+import (
+	"github.com/lestrrat-go/jwx/jwk"
+)
+
 type ClientConfig struct {
 	Type         string
 	ClientId     string
@@ -16,6 +20,8 @@ type OIDCConfig struct {
 	AuthorizationEndpoint string `json:"authorization_endpoint"`
 	TokenEndpoint         string `json:"token_endpoint"`
 	UserInfoEndpoint      string `json:"userinfo_endpoint"`
+	Keys                  string `json:"jwks_uri"`
+	KeySet                jwk.Set
 }
 
 type TokenResponse struct {

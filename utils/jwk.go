@@ -1,15 +1,17 @@
 package utils
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
+	"github.com/lestrrat-go/jwx/jwk"
 	"log"
 	"net/http"
 	"yufuid.com/oidc-go-client/config"
 )
 
 func GenOIDCConfig(clientId string, clientSecret string, wellKnownUrl string) config.OIDCConfig {
-	config := config.OIDCConfig{};
+	oidcConfig := config.OIDCConfig{};
 	client := NewHTTPClient();
 	req, _ := http.NewRequest("GET", wellKnownUrl, nil)
 
@@ -19,11 +21,15 @@ func GenOIDCConfig(clientId string, clientSecret string, wellKnownUrl string) co
 	}
 	defer resp.Body.Close()
 
-	config.ClientId = clientId;
-	config.ClientSecret = clientSecret;
-	if err := json.NewDecoder(resp.Body).Decode(&config); err != nil {
+	oidcConfig.ClientId = clientId;
+	oidcConfig.ClientSecret = clientSecret;
+	if err := json.NewDecoder(resp.Body).Decode(&oidcConfig); err != nil {
 		log.Printf("failed to load .well-known: %v\n", err)
-		return config;
+		return oidcConfig;
 	}
-	return config;
+
+	//写入keys文件
+	set, err := jwk.Fetch(context.Background(), oidcConfig.Keys)
+	oidcConfig.KeySet = set;
+	return oidcConfig;
 }

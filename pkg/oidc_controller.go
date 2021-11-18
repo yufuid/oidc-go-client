@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/labstack/echo"
+	"github.com/lestrrat-go/jwx/jwt"
 	"net/http"
 	"net/url"
 	"strings"
@@ -117,6 +118,10 @@ func getToken(client *http.Client, code string) (config.TokenResponse, error) {
 }
 
 func getUserInfo(client *http.Client, token config.TokenResponse) (interface{}, error) {
+	idToken, err := jwt.Parse([]byte(token.IDToken), jwt.WithKeySet(oidcConfig.KeySet))
+	if err != nil {
+		return nil, err;
+	}
 	req, _ := http.NewRequest("GET", oidcConfig.UserInfoEndpoint, nil)
 	req.Header.Set("Authorization", "Bearer "+token.AccessToken);
 	resp, err := client.Do(req)
@@ -124,7 +129,10 @@ func getUserInfo(client *http.Client, token config.TokenResponse) (interface{}, 
 		return "", err
 	}
 	defer resp.Body.Close();
-	userInfo := new(interface{});
+	userInfo := map[string]interface{}{};
 	e := json.NewDecoder(resp.Body).Decode(&userInfo);
+	if idToken.Subject() != userInfo["sub"] {
+		return nil, fmt.Errorf("sub in idToken not match userInfo")
+	}
 	return userInfo, e;
 }
