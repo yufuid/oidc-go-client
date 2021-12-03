@@ -26,10 +26,10 @@ var (
 var serverCommand = &cobra.Command{
 	Use: "server",
 	Run: func(cmd *cobra.Command, args []string) {
-		pkg.InitClient(cfg);
+		pkg.InitClient(cfg)
 	},
 	PreRun: func(cmd *cobra.Command, args []string) {
-		initConfig();
+		initConfig()
 	},
 }
 
@@ -41,9 +41,9 @@ func main() {
 }
 
 func init() {
-	serverCommand.Flags().StringVarP(&cfgFile, "config", "c", "", "config file");
-	_ = serverCommand.MarkFlagRequired("config");
-	rootCmd.AddCommand(serverCommand);
+	serverCommand.Flags().StringVarP(&cfgFile, "config", "c", "", "config file")
+	_ = serverCommand.MarkFlagRequired("config")
+	rootCmd.AddCommand(serverCommand)
 }
 
 func initConfig() {
